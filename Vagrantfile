@@ -16,6 +16,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell", inline: <<-EOF
     sudo apt-get update
-    sudo apt-get install -y iw
+    sudo apt-get install -y iw wpasupplicant
   EOF
 end
