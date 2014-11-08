@@ -7,7 +7,7 @@ VERSION=$(cat "$(dirname $0)/VERSION" | sed /^[[:blank:]]*$/d | head -n1 | sed -
 BOX_FILE="${NAME}-${VERSION}-${PROVIDER}.box"
 BOX_PATH="/tmp/${BOX_FILE}"
 
-[ "" == "${HOST_SITE}" ] && export HOST_SITE="vagrant.t2t.io"
+[ "" == "${HOST_SITE}" ] && export HOST_SITE="fog.local"
 [ "" == "${HOST_USER}" ] && export HOST_USER="vagrant"
 [ "" == "${HOST_PATH}" ] && export HOST_PATH="/home/vagrant/www/boxes"
 
