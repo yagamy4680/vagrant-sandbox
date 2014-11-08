@@ -1,0 +1,39 @@
+#!/bin/bash
+
+PROVIDER="virtualbox"
+NAME=$(basename $(pwd))
+VERSION=$(cat "$(dirname $0)/VERSION" | sed /^[[:blank:]]*$/d | head -n1 | sed -e 's/^ *//' -e 's/ *$//')
+BOX_FILE="${NAME}-${VERSION}-${PROVIDER}.box"
+BOX_PATH="/tmp/${BOX_FILE}"
+
+[ "" == "${HOST_SITE}" ] && export HOST_SITE="vagrant.t2t.io"
+[ "" == "${HOST_USER}" ] && export HOST_USER="vagrant"
+[ "" == "${HOST_PATH}" ] && export HOST_PATH="/home/vagrant/www/boxes"
+
+HOST_URL="${HOST_USER}@${HOST_SITE}:${HOST_PATH}"
+EXISTS=$(ssh ${HOST_USER}@${HOST_SITE} "find ${HOST_PATH}/${BOX_FILE}")
+
+if [ "" != "${EXISTS}" ]; then
+	echo "the box file ${BOX_FILE} exists on host server, are you sure to build same version box and overwrite the existed one?"
+	read ANSWER
+	if [ "yes" == "${ANSWER}" ] || [ "y" == "${ANSWER}" ]; then
+		echo ""
+	else
+		exit 0
+	fi
+fi
+
+echo -e "going to build box: "
+echo -e "\tname: ${NAME}"
+echo -e "\tversion: ${VERSION}"
+echo -e ""
+
+vagrant destroy -f
+vagrant up
+vagrant ssh -c "sudo apt-get clean"
+vagrant ssh -c "sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*"
+rm -f ${BOX_PATH}
+vagrant package --output=${BOX_PATH}
+
+echo "upload box to ${HOST_SITE}"
+scp ${BOX_PATH} ${HOST_URL}
